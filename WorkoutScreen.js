@@ -8,19 +8,46 @@ import {
   StatusBar,
   Button,
   TouchableOpacity,
+  Vibration,
 } from "react-native";
 import { useState, useEffect, useRef } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainPer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 export default function Workout(props) {
   let timer = "02.59";
   let seconds = 20;
   let workoutIndex = 1;
+  //workoutInfo, mins,section
   const workouts = [
-    { name: "Push Ups", reps: 10, interval: 2000 },
-    { name: "Squats", reps: 5, interval: 2000 },
-    { name: "Plank", reps: 30, interval: 2000 },
+    {
+      arms: [
+        { name: "Push Ups", reps: 10, interval: 2000 },
+        { name: "Bicep Curls", reps: 8, interval: 3000 },
+        { name: "Tricep Dips", reps: 12, interval: 2500 },
+        { name: "Hammer Curls", reps: 10, interval: 3000 },
+        { name: "Overhead Press", reps: 8, interval: 3000 },
+        { name: "Close Grip Bench Press", reps: 12, interval: 2500 },
+      ],
+      chest: [
+        { name: "Bench Press", reps: 15, interval: 2000 },
+        { name: "Pull Ups", reps: 3, interval: 2000 },
+        { name: "Plank", reps: 30, interval: 2000 },
+      ],
+      abs: [
+        { name: "Sit ups", reps: 15, interval: 1000 },
+        { name: "Crunches", reps: 15, interval: 1000 },
+        { name: "Reverse Crunches", reps: 15, interval: 1000 },
+      ],
+      legs: [
+        { name: "Squats", reps: 10, interval: 2000 },
+        { name: "Squats", reps: 5, interval: 2000 },
+        { name: "Plank", reps: 30, interval: 2000 },
+      ],
+    },
+    10,
+    3,
   ];
+
   const Stack = createStackNavigator();
   const [time, setTime] = useState(seconds);
   const [reps, setReps] = useState(numberOfReps);
@@ -30,18 +57,28 @@ export default function Workout(props) {
   const [index, setIndex] = useState(1);
   const intervalId = useRef(null);
   const intervalId2 = useRef(null);
-  let numberOfReps = workouts[0].reps;
+
+  let numberOfReps = workouts[0][props.route.params.data][0].reps;
+  function calculateTime(){
+    let totalTime = []
+    let finalResult = 0
+    for(let i =0;i<workouts[0][props.route.params.data].length;i++){
+      totalTime.push((workouts[0][props.route.params.data][i].interval*workouts[0][props.route.params.data][i].reps)/1000)
+      finalResult = totalTime.reduce((total,num)=>{return total+num})
+    }
+    return finalResult
+  }
   function useEffectFunc() {
-    if(!isPressed){
-      numberOfReps = workouts[index - 1].reps;
+    if (!isPressed) {
+      numberOfReps = workouts[0][props.route.params.data][index - 1].reps;
       intervalId.current = setInterval(formatTime, 1000);
       intervalId2.current = setInterval(workout, 100);
-      console.log(true);
     }
+    console.log("index", index, workouts.length);
   }
   useEffect(() => {
-    if (index <= workouts.length) useEffectFunc();
-  }, [index,isPressed]);
+    if (index <= workouts[0][props.route.params.data].length) useEffectFunc();
+  }, [index, isPressed]);
   function formatTime() {
     const min = Math.floor(seconds / 60);
     const sec = seconds % 60;
@@ -67,28 +104,35 @@ export default function Workout(props) {
       setFinished(true);
     }
   }
-  useEffect(()=>{
+  useEffect(() => {
     if (isPressed) {
       setIndex((prev) => (prev += 1));
       //setIsPressed(false);
       setFinished(false);
     }
-  },[isPressed])
+  }, [isPressed]);
   // return <ReadyScreen />;
   //  <SelectScreen/>
-  return(isPressed?<ReadyScreen setIsPressed={setIsPressed} nextWorkout={workouts[index - 1]}/>:workoutIndex <= workouts.length ? (
+  return isPressed ? (
+    <ReadyScreen
+      setIsPressed={setIsPressed}
+      nextWorkout={workouts[0][props.route.params.data][index - 1]}
+    />
+  ) : workoutIndex <= workouts[0][props.route.params.data].length ? (
     <WorkoutScreen
       time={time}
       reps={reps}
       finished={finished}
       navigation={props.navigation}
       setIsPressed={setIsPressed}
-      workoutInfo={workouts[index - 1]}
+      workoutInfo={workouts[0][props.route.params.data][index - 1]}
       index={index}
       workout={workouts}
+      workoutType={props.route.params.data}
+      calculateTime = {calculateTime}
+      getData={props.route.params.getTime}
     />
-  ) : null
-  )
+  ) : null;
 }
 function ReadyScreen(props) {
   const [counter, setCounter] = useState(3);
@@ -98,7 +142,7 @@ function ReadyScreen(props) {
       setCounter((prevCounter) => {
         if (prevCounter === 0) {
           clearInterval(interval);
-          props.setIsPressed(false)
+          props.setIsPressed(false);
           return prevCounter;
         } else {
           return prevCounter - 1;
@@ -156,10 +200,11 @@ function WorkoutScreen(props) {
               bottom: -50,
               color: "#F4B324",
               fontWeight: "700",
+              textAlign: "center",
             },
           ]}
         >
-          {props.index <= props.workout.length
+          {props.index <= props.workout[0][props.workoutType].length
             ? `${props.workoutInfo.reps}x ${props.workoutInfo.name}`
             : "No More Workouts Left"}
         </Text>
@@ -174,13 +219,13 @@ function WorkoutScreen(props) {
             }}
           >
             <Text style={styles.infoText}>{`Reps: ${
-              props.index <= props.workout.length
+              props.index <= props.workout[0][props.workoutType].length
                 ? props.workoutInfo.reps
                 : null
             }`}</Text>
-            <Text
-              style={styles.infoText}
-            >{`Sections: ${props.index}/${props.workout.length}`}</Text>
+            <Text style={styles.infoText}>{`Sections: ${props.index}/${
+              props.workout[0][props.workoutType].length
+            }`}</Text>
           </View>
 
           <View style={styles.numberPushUps}>
@@ -198,13 +243,19 @@ function WorkoutScreen(props) {
             }
             onPress={() => {
               // props.finished ? props.navigation.push("HomeScreen") : null;
-              if (props.finished && props.index < props.workout.length) {
+              if (
+                props.finished &&
+                props.index < props.workout[0][props.workoutType].length
+              ) {
                 props.setIsPressed(true);
               } else if (
-                props.index >= props.workout.length &&
+                props.index >= props.workout[0][props.workoutType].length &&
                 props.finished
               ) {
-                props.navigation.push("DoneScreen");
+                props.navigation.push("DoneScreen", {
+                  workouts: props.workout,
+                });
+                props.getData(props.calculateTime())
               }
             }}
           >
@@ -222,14 +273,13 @@ function WorkoutScreen(props) {
   );
 }
 
-
 const styles = StyleSheet.create({
   counterContainer: {
     width: 170,
     height: 170,
     borderColor: "#6540ea",
     borderWidth: 10,
-    borderRadius: "100%",
+    borderRadius: 1000,
     justifyContent: "center",
     alignItems: "center",
   },

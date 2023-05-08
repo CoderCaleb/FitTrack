@@ -17,17 +17,14 @@ export default function DoneScreen(props) {
         <Text style={styles.congratulateText}>Congratulations!</Text>
         <Text style={styles.subText}>You have completed the workout!</Text>
         <View style={styles.mainResultContainer}>
+
           <View style={styles.resultContainer}>
-            <Text style={styles.titleText}>10</Text>
+            <Text style={styles.titleText}>{props.route.params['workouts'][1]}</Text>
             <Text style={styles.subText}>Minutes</Text>
           </View>
           <View style={styles.resultContainer}>
-            <Text style={styles.titleText}>10</Text>
-            <Text style={styles.subText}>kCal</Text>
-          </View>
-          <View style={styles.resultContainer}>
-            <Text style={styles.titleText}>3</Text>
-            <Text style={styles.subText}>Sections</Text>
+            <Text style={styles.titleText}>{props.route.params['workouts'][0]['arms'].length}</Text>
+            <Text style={styles.subText}>Sections Completed</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.homeButton} onPress={()=>props.navigation.push('HomeScreen')}><Text style={styles.text}>Home</Text></TouchableOpacity>
