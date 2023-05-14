@@ -14,6 +14,7 @@
     "@react-navigation/stack": "^6.3.16",
     "expo": "~48.0.15",
     "expo-status-bar": "~1.4.4",
+    "firebase": "9.7.0",
     "react": "18.2.0",
     "react-native": "0.71.7",
     "react-native-gesture-handler": "~2.9.0",
@@ -23,7 +24,8 @@
     "react-native-screens": "~3.20.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "react-native-dev-menu": "^4.1.1"
   },
   "private": true
 }
