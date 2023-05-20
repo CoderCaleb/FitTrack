@@ -10,7 +10,14 @@ import {
     TouchableOpacity,
   } from "react-native";
   import { useState, useEffect, useRef } from "react";
+import { set } from "firebase/database";
 export default function DoneScreen(props) {
+  const [dataTime,setDataTime] = useState(443)
+  useEffect(()=>{
+    console.log('DataTime: ',props.route.params.workouts)
+    setDataTime(props.route.params.dataTime)
+
+  },[props.route.params['dataTime']])
     return (
       <SafeAreaView style={styles.container}>
         <Image source={require('./assets/images/throphy.png')} style={styles.throphyImg}></Image>
@@ -19,11 +26,11 @@ export default function DoneScreen(props) {
         <View style={styles.mainResultContainer}>
 
           <View style={styles.resultContainer}>
-            <Text style={styles.titleText}>{props.route.params['workouts'][1]}</Text>
+            <Text style={styles.titleText}>{dataTime}</Text>
             <Text style={styles.subText}>Minutes</Text>
           </View>
           <View style={styles.resultContainer}>
-            <Text style={styles.titleText}>{props.route.params['workouts'][0]['arms'].length}</Text>
+            <Text style={styles.titleText}>{props.route.params['workouts'][0][props.route.params.data].length}</Text>
             <Text style={styles.subText}>Sections Completed</Text>
           </View>
         </View>

@@ -13,10 +13,15 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { NavigationContainPer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+//import { NavigationActions } from '@react-navigation/native';
+import {set,ref,getDatabase,get, update} from 'firebase/database'
+import {getAuth} from 'firebase/auth'
+
 export default function Workout(props) {
   let timer = "02.59";
   let seconds = 20;
   let workoutIndex = 1;
+  
   //workoutInfo, mins,section
   const workouts = [
     {
@@ -47,6 +52,7 @@ export default function Workout(props) {
     10,
     3,
   ];
+  let numberOfReps = workouts[0][props.route.params.data][0].reps;
 
   const Stack = createStackNavigator();
   const [time, setTime] = useState(seconds);
@@ -55,10 +61,11 @@ export default function Workout(props) {
   const [isEnd, setIsEnd] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const [index, setIndex] = useState(1);
+  const [dbTime, setDbTime] = useState(0)
+  const [dbCompleted, setDbCompleted] = useState(0)
   const intervalId = useRef(null);
   const intervalId2 = useRef(null);
 
-  let numberOfReps = workouts[0][props.route.params.data][0].reps;
   function calculateTime(){
     let totalTime = []
     let finalResult = 0
@@ -72,7 +79,9 @@ export default function Workout(props) {
     if (!isPressed) {
       numberOfReps = workouts[0][props.route.params.data][index - 1].reps;
       intervalId.current = setInterval(formatTime, 1000);
-      intervalId2.current = setInterval(workout, 100);
+     // intervalId2.current = setInterval(workout, workouts[0][props.route.params.data][index-1].interval);
+     intervalId2.current = setInterval(workout, 100);
+
     }
     console.log("index", index, workouts.length);
   }
@@ -183,6 +192,8 @@ function ReadyScreen(props) {
 }
 
 function WorkoutScreen(props) {
+  const auth = getAuth()
+  const userInstance = ref(getDatabase(),`/users/${auth.currentUser.uid}`)
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.imgContainer}>
@@ -252,10 +263,23 @@ function WorkoutScreen(props) {
                 props.index >= props.workout[0][props.workoutType].length &&
                 props.finished
               ) {
+                props.getData(props.calculateTime())
+                get(userInstance)
+                .then((snapshot)=>{
+                  if(snapshot.exists()){
+                    result = snapshot.val()
+                    update(userInstance,{
+                      timeSpent:result.timeSpent+Math.round(props.calculateTime()/60),
+                      completed: result.completed+=1
+                    })
+                    console.log('result: ',result.timeSpent+Math.round(props.calculateTime()/60))
+                  }
+                })
+                .catch((err)=>{console.log(err)})
                 props.navigation.push("DoneScreen", {
                   workouts: props.workout,
+                  dataTime: Math.round(props.calculateTime()/60),
                 });
-                props.getData(props.calculateTime())
               }
             }}
           >

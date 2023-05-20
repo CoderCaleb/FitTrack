@@ -19,7 +19,8 @@ import SignUpScreen from './SignUpScreen'
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import firebase from 'firebase/compat/app'
-
+import {set,ref,getDatabase,get} from 'firebase/database'
+import {getAuth,onAuthStateChanged} from 'firebase/auth'
 const firebaseConfig = {
   apiKey: "AIzaSyApr_jKjnMAAi0gq_wOl5pJEKsdfqcpmDE",
   authDomain: "fittrack-app-238bd.firebaseapp.com",
@@ -32,27 +33,31 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 export default function App() {
+  const auth = getAuth()
+  let result ={}
+  const userInstance = auth.currentUser?ref(getDatabase(),`/users/${auth.currentUser.uid}`):null
+  
   const [data,setData] = useState('arms')
   const [time,setTime] = useState(0)
+  const [dataTime, setDataTime] = useState(0)
   const [completed, setCompleted] = useState(0)
   function getData(data) {
     setData(data)
+    console.log('data: ',data)
   }
   function getTime(data) {
-  //  totalTime=totalTime+data
-    setTime(time+data)
-    setCompleted(prev=>prev+=1)
+    console.log(data);
+    setDataTime(data)
   }
-  useEffect(()=>{
-    console.log('Time',time)
-    console.log('Copleted',completed)
-  },[time,completed])
+ 
+  
   const Stack = createStackNavigator();
   function CustomHeader(){
     return(
       <Text style={{color:'black'}}>Back</Text>
     )
   }
+  console.log('hgi',dataTime)
   return (    
     <NavigationContainer>
     <Stack.Navigator initialRouteName="SignUpScreen" screenOptions={{
@@ -65,7 +70,7 @@ export default function App() {
       <Stack.Screen name="HomeScreen" component={HomeScreen} initialParams={{time,completed}}/>
       <Stack.Screen name="SelectScreen" component={SelectScreen} initialParams={{ getData }} />
       <Stack.Screen name="WorkoutScreen" component={Workout} initialParams={{data,getTime}}/>
-      <Stack.Screen name="DoneScreen" component={DoneScreen}/>
+      <Stack.Screen name="DoneScreen" component={DoneScreen} initialParams={{data}}/>
       <Stack.Screen name="LoginScreen" component={LoginScreen}/>
       <Stack.Screen name="SignUpScreen" component={SignUpScreen}/>
 
