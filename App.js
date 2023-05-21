@@ -41,6 +41,7 @@ export default function App() {
   const [time,setTime] = useState(0)
   const [dataTime, setDataTime] = useState(0)
   const [completed, setCompleted] = useState(0)
+  const [signedIn, setSignIn] = useState(false)
   function getData(data) {
     setData(data)
     console.log('data: ',data)
@@ -49,7 +50,10 @@ export default function App() {
     console.log(data);
     setDataTime(data)
   }
- 
+ onAuthStateChanged(auth,(user)=>{
+  const checkIn = user?true:false;
+  setSignIn(checkIn)
+ })
   
   const Stack = createStackNavigator();
   function CustomHeader(){
@@ -67,13 +71,21 @@ export default function App() {
      // headerLeft: ()=><CustomHeader/>
       
     }}>
+
+      {
+        signedIn?
+        <>
       <Stack.Screen name="HomeScreen" component={HomeScreen} initialParams={{time,completed}}/>
       <Stack.Screen name="SelectScreen" component={SelectScreen} initialParams={{ getData }} />
       <Stack.Screen name="WorkoutScreen" component={Workout} initialParams={{data,getTime}}/>
       <Stack.Screen name="DoneScreen" component={DoneScreen} initialParams={{data}}/>
+      </>
+:
+<>
       <Stack.Screen name="LoginScreen" component={LoginScreen}/>
       <Stack.Screen name="SignUpScreen" component={SignUpScreen}/>
-
+      </>
+      }
 
     </Stack.Navigator>
   </NavigationContainer>

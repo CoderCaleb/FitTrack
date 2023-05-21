@@ -10,6 +10,7 @@ import {
 import React from "react";
 import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import CircularProgress from "react-native-circular-progress-indicator";
 //import { initializeApp } from "firebase/app";
 
 export default function LoginScreen(props) {
@@ -63,6 +64,7 @@ export default function LoginScreen(props) {
             onChangeText={(value) => {
               setEmail(value);
             }}
+            autoComplete="email"
           ></TextInput>
         </View>
         <View style={styles.inputContainer}>
@@ -81,12 +83,13 @@ export default function LoginScreen(props) {
             }}
             onFocus={() => setIsFocused("password")}
             value={password}
+            autoComplete="password"
           ></TextInput>
         </View>
         <View
           style={
             wrong
-              ? [styles.wrongPasswordContainer, { display: "block" }]
+              ? [styles.wrongPasswordContainer, { display:'flex'}]
               : styles.wrongPasswordContainer
           }
         >

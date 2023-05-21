@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React from "react";
 import { useState, useEffect } from "react";
-import { createUserWithEmailAndPassword,updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { getAuth } from "firebase/auth";
 import { ref, push, getDatabase, set, update } from "firebase/database";
 export default function LoginScreen(props) {
@@ -33,9 +33,9 @@ export default function LoginScreen(props) {
     createUserWithEmailAndPassword(auth, email, password)
       .then((creds) => {
         const user = creds.user;
-        updateProfile(user,{
-            displayName: username,
-          })
+        updateProfile(user, {
+          displayName: username,
+        })
           .then((result) => {
             console.log("Profile updated successfully");
             update(dbInstance, {
@@ -46,8 +46,8 @@ export default function LoginScreen(props) {
               },
             });
           })
-          .catch((err) => console.log(err))
-       
+          .catch((err) => console.log(err));
+
         console.log("Login successful", user.displayName);
       })
       .catch((err) => console.log(err.message));

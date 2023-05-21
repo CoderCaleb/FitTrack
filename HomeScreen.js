@@ -34,7 +34,7 @@ export default function HomeScreen(props) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ width: "90%" }}>
-      <Text style={styles.titleText}>FitTrack</Text>
+      <Image source={require('./assets/images/fittrack-logo.png')} style={styles.logoImage}></Image>
         <View style={styles.userInfoContainer}>
           <Image
             source={require("./assets/images/cat-pfp.jpeg")}
@@ -59,7 +59,7 @@ export default function HomeScreen(props) {
             />
             <Text style={styles.numberText}>{time}</Text>
             <Text style={styles.infoType}>
-              {Math.round(props.route.params.time / 60) > 1
+              {time > 1
                 ? "Minutes"
                 : "Minute"}
             </Text>
@@ -68,7 +68,7 @@ export default function HomeScreen(props) {
             style={[
               styles.infoBox,
               {
-                backgroundColor: "#159895",
+                backgroundColor: "#87CBB9",
               },
             ]}
           >
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   nameText: {
-    fontSize: 30,
+    fontSize: 27,
     fontWeight: "bold",
     color: "white",
   },
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     flex: 1,
-    backgroundColor: "#57C5B6",
+    backgroundColor: "#D4ADFC",
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
@@ -182,4 +182,8 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     borderRadius:15
   },
+  logoImage:{
+    width:200,
+    height:50,
+  }
 });

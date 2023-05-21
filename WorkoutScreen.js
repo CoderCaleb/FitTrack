@@ -16,6 +16,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 //import { NavigationActions } from '@react-navigation/native';
 import {set,ref,getDatabase,get, update} from 'firebase/database'
 import {getAuth} from 'firebase/auth'
+import CircularProgress from "react-native-circular-progress-indicator";
 
 export default function Workout(props) {
   let timer = "02.59";
@@ -79,8 +80,8 @@ export default function Workout(props) {
     if (!isPressed) {
       numberOfReps = workouts[0][props.route.params.data][index - 1].reps;
       intervalId.current = setInterval(formatTime, 1000);
-     // intervalId2.current = setInterval(workout, workouts[0][props.route.params.data][index-1].interval);
-     intervalId2.current = setInterval(workout, 100);
+     intervalId2.current = setInterval(workout, workouts[0][props.route.params.data][index-1].interval);
+     //intervalId2.current = setInterval(workout, 100);
 
     }
     console.log("index", index, workouts.length);
@@ -136,10 +137,11 @@ export default function Workout(props) {
       setIsPressed={setIsPressed}
       workoutInfo={workouts[0][props.route.params.data][index - 1]}
       index={index}
-      workout={workouts}
+      workout={workouts}n
       workoutType={props.route.params.data}
       calculateTime = {calculateTime}
       getData={props.route.params.getTime}
+      numberOfReps={numberOfReps}
     />
   ) : null;
 }
@@ -184,9 +186,8 @@ function ReadyScreen(props) {
         {`${props.nextWorkout.reps}x ${props.nextWorkout.name} Next`}
       </Text>
       <Text style={styles.readyText}>Get Ready!</Text>
-      <View style={styles.counterContainer}>
-        <Text style={styles.timerText}>{counter}</Text>
-      </View>
+      <CircularProgress value={counter} progressValueColor={'white'} maxValue={3} radius={100}/>
+
     </View>
   );
 }
@@ -240,11 +241,9 @@ function WorkoutScreen(props) {
           </View>
 
           <View style={styles.numberPushUps}>
-            <Text
-              style={[styles.timerText, { fontSize: 40, color: "#F4B324" }]}
-            >
-              {props.reps + "x"}
-            </Text>
+           
+              <CircularProgress value={props.reps} title="Reps" duration={100} titleColor={'#F4B324'} progressValueColor={'#F4B324'} activeStrokeColor={'#badc58'} maxValue={props.workoutInfo.reps}/>
+
           </View>
           <TouchableOpacity
             style={
