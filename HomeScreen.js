@@ -1,17 +1,26 @@
-import { View, Text, StyleSheet, SafeAreaView, Image } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, SafeAreaView, Image, ScrollView, ImageBackground } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 //import firebase from 'firebase'
 import { getDatabase, ref, set, get, onValue, update } from "firebase/database";
 import { getAuth, signOut } from "firebase/auth";
+import {workouts} from './WorkoutData'
+const ButtonContext = React.createContext()
+
 export default function HomeScreen(props) {
   const auth = getAuth();
   const userInstance = ref(getDatabase(), `/users/${auth.currentUser.uid}`);
   const [completed, setCompleted] = useState(0);
   const [time, setTime] = useState(0);
   //const [data, setData] = useState({})
+  const [selected, setSelected] = useState("arms");
+  const [buttonClick, setButtonClick] = useState(false)
+  const [isScrolling, setIsScrolling] = useState(false)
+  const keys = Object.keys(workouts[0])
+  console.log('keys',keys)
   let data = {};
   console.log(userInstance);
+ 
 
   useEffect(() => {
     console.log(data);
@@ -31,10 +40,19 @@ export default function HomeScreen(props) {
     });
     props.navigation.navigate('LoginScreen')
   }
+  function calculateTime(data){
+    let totalTime = []
+    let finalResult = 0
+    for(let i =0;i<workouts[0][data].length;i++){
+      totalTime.push((workouts[0][data][i].interval*workouts[0][data][i].reps)/1000)
+      finalResult = totalTime.reduce((total,num)=>{return total+num})
+    }
+    return finalResult
+  }
   return (
+    <ScrollView onScrollBeginDrag={()=>setIsScrolling(true)} onScrollEndDrag={()=>setIsScrolling(false)}>
     <SafeAreaView style={styles.container}>
       <View style={{ width: "90%" }}>
-      <Image source={require('./assets/images/fittrack-logo.png')} style={styles.logoImage}></Image>
         <View style={styles.userInfoContainer}>
           <Image
             source={require("./assets/images/cat-pfp.jpeg")}
@@ -82,14 +100,96 @@ export default function HomeScreen(props) {
             <Text style={styles.infoType}>Completed</Text>
           </View>
         </View>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => props.navigation.push("SelectScreen")}
-        >
-          <Text style={styles.text}>Start Workout</Text>
-        </TouchableOpacity>
+       
+      </View>
+      <View style={styles.workoutContainer}>
+       <Text style={styles.subText}>What's on your mind</Text> 
+<ButtonContext.Provider value={{buttonClick, setButtonClick,setSelected}}>
+      {
+        keys.map((value,index)=>{
+          return(
+<WorkoutBox
+          infoType={value}
+          infoTime={Math.round(calculateTime(value)/60)}
+          bgImage={workouts[0][value][0]['bgImage']}
+          setSelected={setSelected}
+          isScrolling={isScrolling}
+          navigate={props.navigation.navigate}
+        />)})
+      }
+      
+       
+       { /*<WorkoutBox
+          url={require("./assets/images/arms-flex.png")}
+          infoType="Arms"
+          infoTime="10 mins"
+          id="arms"
+          selected={selected} 
+          setSelected={setSelected}
+          bgImg={require('./assets/images/arms-background.webp')}
+        />
+        <WorkoutBox
+          url={require("./assets/images/bench-press.png")}
+          infoType="Chest"
+          infoTime="10 mins"
+          id="chest"
+          selected={selected}
+          setSelected={setSelected}
+            bgImg={require('./assets/images/chestworkout-bg.webp')}
+        />
+        <WorkoutBox
+          url={require("./assets/images/abs-workout-icon.png")}
+          infoType="Abs"
+          infoTime="10 mins"
+          id="abs"
+          selected={selected}
+          setSelected={setSelected}
+          navigate={props.navigation.navigate}
+          bgImg={require('./assets/images/abs-background.png')}
+        />
+        <WorkoutBox
+          url={require("./assets/images/leg-workout-icon.png")}
+          infoType="Legs"
+          infoTime="10 mins"
+          id="legs"
+          selected={selected}
+          setSelected={setSelected}
+          bgImg={require('./assets/images/legworkout-bg.jpeg')}
+          />*/}
+        </ButtonContext.Provider>
       </View>
     </SafeAreaView>
+    </ScrollView>
+  );
+}
+
+function WorkoutBox(props) {
+  const {setButtonClick, buttonClick,setSelected} = useContext(ButtonContext)
+  console.log('bgImg',props.bgImg)
+  return (
+
+    <TouchableOpacity
+      style={
+        styles.workoutChoice
+      }
+      onPress={() => {
+        if(!props.isScrolling){
+        props.navigate('WorkoutScreen',{
+          data:props.infoType
+        })
+        console.log(props.infoType)
+      }  
+      }}
+    >
+        <ImageBackground style={styles.imgBg} source={props.bgImage} imageStyle={{borderRadius:10}}>
+          <View style={{flex:1,borderRadius:10,justifyContent:'flex-end',backgroundColor: 'rgba(0,0,0,0.2)',padding:15,gap:5}}>
+            <Text style={styles.infoText}>{props.infoType.charAt(0).toUpperCase()+props.infoType.slice(1)}</Text>
+            <Text style={styles.textTime}>{props.infoTime+' minutes'}</Text>
+          </View>
+        </ImageBackground>
+
+    </TouchableOpacity>
+
   );
 }
 const styles = StyleSheet.create({
@@ -97,6 +197,21 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 17,
     fontWeight: "bold",
+  },
+  subText:{
+    color: "white",
+    fontSize: 17,
+    fontWeight: "bold",
+    width:'90%',
+    alignSelf:'center'
+  },
+  textTime:{
+    color:'white',
+    fontSize:15,
+  },
+  imgBg:{
+    flex:1,
+    width:'100%',
   },
   container: {
     alignItems: "center",
@@ -130,7 +245,7 @@ const styles = StyleSheet.create({
     height: 200,
     gap: 20,
     flexDirection: "row",
-    marginTop: 30,
+    marginTop: 30, 
   },
   infoBox: {
     flex: 1,
@@ -185,5 +300,63 @@ const styles = StyleSheet.create({
   logoImage:{
     width:200,
     height:50,
-  }
+  },
+  workoutChoice: {
+    width:'90%',
+    height: 150,
+    backgroundColor: "#1b2841",
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf:'center'
+  },
+  titleText: {
+    fontSize: 30,
+    color: "white",
+    fontWeight: "bold",
+    marginBottom: 20,
+    marginLeft: "10%",
+    marginTop:30,
+  },
+  imageIcon: {
+    width: "50%",
+    height: "50%",
+  },
+  infoText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize:30,
+  },
+  doneButton: {
+    backgroundColor: "#304ffd",
+    width: 70,
+    height: 70,
+    borderRadius: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    bottom: 50,
+    right: 20,
+  },
+  buttonImg: {
+    width: "80%",
+    height: "80%",
+  },
+  workoutContainer: {
+    justifyContent: "center",
+    gap: 20,
+    width: "100%",
+    marginTop:20,
+  },
+  titleText: {
+    fontSize: 30,
+    color: "white",
+    fontWeight: "bold",
+    marginBottom: 20,
+    marginLeft: "10%",
+    marginTop:30,
+  },
+
+
+ 
 });

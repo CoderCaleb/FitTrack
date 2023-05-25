@@ -8,8 +8,10 @@ import {
   StatusBar,
   Button,
   TouchableOpacity,
-  Vibration,
+  FlatList,
+  ImageBackground,
 } from "react-native";
+import {workouts} from './WorkoutData'
 import { useState, useEffect, useRef } from "react";
 import { NavigationContainPer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -22,37 +24,12 @@ export default function Workout(props) {
   let timer = "02.59";
   let seconds = 20;
   let workoutIndex = 1;
-  
   //workoutInfo, mins,section
-  const workouts = [
-    {
-      arms: [
-        { name: "Push Ups", reps: 10, interval: 2000 },
-        { name: "Bicep Curls", reps: 8, interval: 3000 },
-        { name: "Tricep Dips", reps: 12, interval: 2500 },
-        { name: "Hammer Curls", reps: 10, interval: 3000 },
-        { name: "Overhead Press", reps: 8, interval: 3000 },
-        { name: "Close Grip Bench Press", reps: 12, interval: 2500 },
-      ],
-      chest: [
-        { name: "Bench Press", reps: 15, interval: 2000 },
-        { name: "Pull Ups", reps: 3, interval: 2000 },
-        { name: "Plank", reps: 30, interval: 2000 },
-      ],
-      abs: [
-        { name: "Sit ups", reps: 15, interval: 1000 },
-        { name: "Crunches", reps: 15, interval: 1000 },
-        { name: "Reverse Crunches", reps: 15, interval: 1000 },
-      ],
-      legs: [
-        { name: "Squats", reps: 10, interval: 2000 },
-        { name: "Squats", reps: 5, interval: 2000 },
-        { name: "Plank", reps: 30, interval: 2000 },
-      ],
-    },
-    10,
-    3,
-  ];
+  console.log(props.route.params)
+  useEffect(()=>{
+    console.log('HELLO: ',props.route.params.data)
+  },[props.route.params.data])
+  
   let numberOfReps = workouts[0][props.route.params.data][0].reps;
 
   const Stack = createStackNavigator();
@@ -64,9 +41,9 @@ export default function Workout(props) {
   const [index, setIndex] = useState(1);
   const [dbTime, setDbTime] = useState(0)
   const [dbCompleted, setDbCompleted] = useState(0)
+  const [isReady, setIsReady] = useState(false)
   const intervalId = useRef(null);
   const intervalId2 = useRef(null);
-
   function calculateTime(){
     let totalTime = []
     let finalResult = 0
@@ -77,18 +54,20 @@ export default function Workout(props) {
     return finalResult
   }
   function useEffectFunc() {
-    if (!isPressed) {
+    if (!isPressed&&isReady) {
       numberOfReps = workouts[0][props.route.params.data][index - 1].reps;
-      intervalId.current = setInterval(formatTime, 1000);
      intervalId2.current = setInterval(workout, workouts[0][props.route.params.data][index-1].interval);
-     //intervalId2.current = setInterval(workout, 100);
-
+      console.log('if ran')
     }
-    console.log("index", index, workouts.length);
   }
+  useEffect(()=>{
+    setReps(workouts[0][props.route.params.data][index-1].reps);
+    console.log(reps)
+  },[index]) 
+  console.log('com re')
   useEffect(() => {
     if (index <= workouts[0][props.route.params.data].length) useEffectFunc();
-  }, [index, isPressed]);
+  }, [index, isPressed, isReady]);
   function formatTime() {
     const min = Math.floor(seconds / 60);
     const sec = seconds % 60;
@@ -114,6 +93,7 @@ export default function Workout(props) {
       setFinished(true);
     }
   }
+
   useEffect(() => {
     if (isPressed) {
       setIndex((prev) => (prev += 1));
@@ -123,7 +103,11 @@ export default function Workout(props) {
   }, [isPressed]);
   // return <ReadyScreen />;
   //  <SelectScreen/>
-  return isPressed ? (
+  
+  return( 
+    isReady?(
+    isPressed ? (
+
     <ReadyScreen
       setIsPressed={setIsPressed}
       nextWorkout={workouts[0][props.route.params.data][index - 1]}
@@ -137,13 +121,71 @@ export default function Workout(props) {
       setIsPressed={setIsPressed}
       workoutInfo={workouts[0][props.route.params.data][index - 1]}
       index={index}
-      workout={workouts}n
+      workout={workouts}
       workoutType={props.route.params.data}
       calculateTime = {calculateTime}
       getData={props.route.params.getTime}
       numberOfReps={numberOfReps}
     />
-  ) : null;
+  ) : null):<SummaryScreen workoutTypeInfo={workouts[0][props.route.params.data]} workoutType={props.route.params.data} time={Math.round(calculateTime()/60)} setIsReady={setIsReady}/>)
+
+//return(<SummaryScreen workoutTypeInfo={workouts[0][props.route.params.data]} workoutType={props.route.params.data} time={Math.round(calculateTime()/60)}/>)
+  
+ 
+}
+function SummaryScreen(props){
+  DATA = props.workoutTypeInfo.map((value,index)=>{
+    return({
+      title: value.name,
+      id: index.toString(),
+      time: Math.round((value.reps*value.interval)/1000),
+      image: value.image
+    })
+  })
+  return(
+  <SafeAreaView style={styles.container}>
+    <View style={{width:'100%',height:100,justifyContent:'flex-end'}}>
+      <ImageBackground source={props.workoutTypeInfo[0]['bgImage']} style={styles.imageBackground}>
+        <View style={styles.workoutHeader}>
+      <Text style={styles.titleTextHeader}>{props.workoutType.toUpperCase()}</Text>
+      </View>
+      </ImageBackground>
+    </View>
+    <View style={styles.infoTexSumContainer}>
+      <View style={styles.marker}></View>
+      <Text style={styles.infoTextSum}>{props.time+' mins'}</Text>
+      <Text style={styles.infoTextSum}>•</Text>
+      <Text style={styles.infoTextSum}>{props.workoutTypeInfo.length+' workouts'}</Text>
+    </View>
+    <FlatList
+    data={DATA}
+    renderItem={(prop)=><FlatListItem title={prop.item.title} time={prop.item.time} image={prop.item.image}/>}
+    keyExtractor={(prop)=>prop.id}
+    style={{width:'80%'}}
+    />
+    <View style={{flex:1,width:'100%',position:'absolute',height:100,borderTopWidth:1,borderColor:'#636E72',bottom:0,justifyContent:'center',alignItems:'center',backgroundColor:'#121212'}}>
+      <TouchableOpacity style={styles.startButton} onPress={()=>props.setIsReady(true)}>
+        <Text style={{color:'white',fontWeight:'bold'}}>I'm Ready</Text>
+      </TouchableOpacity>
+    </View>
+  </SafeAreaView>
+  )
+
+  function FlatListItem(props) {
+    return (
+      <>
+        <View style={styles.listContainer}>
+          {props.image && <Image source={props.image} style={styles.smallImage} cache="immutable" />}
+          <View style={styles.textContainer}>
+            <Text style={styles.titleName}>{props.title}</Text>
+            <Text style={styles.numberRepsText}>{'x' + props.time}</Text>
+          </View>
+        </View>
+        <View style={styles.lineBreak}></View>
+      </>
+    );
+  }
+  
 }
 function ReadyScreen(props) {
   const [counter, setCounter] = useState(3);
@@ -271,7 +313,6 @@ function WorkoutScreen(props) {
                       timeSpent:result.timeSpent+Math.round(props.calculateTime()/60),
                       completed: result.completed+=1
                     })
-                    console.log('result: ',result.timeSpent+Math.round(props.calculateTime()/60))
                   }
                 })
                 .catch((err)=>{console.log(err)})
@@ -297,6 +338,43 @@ function WorkoutScreen(props) {
 }
 
 const styles = StyleSheet.create({
+  lineBreak:{
+    height:1,
+    width:'100%',
+    backgroundColor:'white'
+  },
+  textContainer:{
+    justifyContent:'center',
+  },
+  smallImage:{
+    height:80,
+    width:80,
+  },
+  titleName:{
+    fontSize:25,
+    fontWeight:500,
+    color:'white',
+    marginBottom:15
+  },
+  listContainer:{
+    flex:1,
+    flexDirection:'row',
+    gap:20,
+    marginVertical:15,
+  },
+  textContainerSum:{
+    flex:1,
+    flexDirection:'row',
+    gap:20
+  },
+  startButton:{
+    width:'90%',
+    height:40,
+    borderRadius:20,
+    backgroundColor:'#653ff1',
+    alignItems:'center',
+    justifyContent:'center',
+  },
   counterContainer: {
     width: 170,
     height: 170,
@@ -327,6 +405,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 30,
   },
+  titleTextHeader:{
+    color: "white",
+    fontSize: 30,
+    fontWeight:600,
+  },
   mainResultContainer: {
     flexDirection: "row",
     width: "90%",
@@ -341,6 +424,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 50,
   },
+  numberRepsText:{
+    color: "white",
+    fontSize: 14,
+  },
   congratulateText: {
     color: "#6540ea",
     fontSize: 30,
@@ -352,9 +439,10 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#1b191a",
+    backgroundColor: "#121212",
     alignItems: "center",
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    
   },
   encourageText: {
     color: "white",
@@ -427,14 +515,44 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flex: 0.9,
   },
+  infoTexSumContainer:{
+    flexDirection:'row',
+    gap:5,
+    width:'100%',
+    height:60,
+    alignItems:'center',
+    borderBottomWidth:1,
+    paddingLeft:30,
+    borderColor: '#FFF7D4'
+  },
   infoText: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+  infoTextSum:{
+    fontSize: 16,
+    fontWeight: "bold",
+    color:'white',
   },
   infoMainContainer: {
     flex: 1,
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
+  },
+  marker:{
+    width:5,
+    height:20,
+    backgroundColor:'#00dac6',
+  },
+  workoutHeader:{
+    width:'100%',
+    height:100,
+    justifyContent:'flex-end',
+    paddingLeft:17,
+    paddingBottom:17,
+  },
+  imageBackground:{
+    flex:1,
   },
 });

@@ -18,7 +18,6 @@ export default function SelectScreen({ navigation,route }) {
   },[selected])
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.titleText}>Select Workout</Text>
       <View style={styles.workoutContainer}>
         <WorkoutBox
           url={require("./assets/images/arms-flex.png")}
@@ -142,4 +141,59 @@ const styles = StyleSheet.create({
     width: "80%",
     height: "80%",
   },
+  workoutChoice: {
+    width: 150,
+    height: 150,
+    backgroundColor: "#1b2841",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  workoutChoiceSelected: {
+    width: 150,
+    height: 150,
+    backgroundColor: "#304ffd",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  workoutContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 20,
+    width: "100%",
+  },
+  titleText: {
+    fontSize: 30,
+    color: "white",
+    fontWeight: "bold",
+    marginBottom: 20,
+    marginLeft: "10%",
+    marginTop:30,
+  },
+  imageIcon: {
+    width: "50%",
+    height: "50%",
+  },
+  infoText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  doneButton: {
+    backgroundColor: "#304ffd",
+    width: 70,
+    height: 70,
+    borderRadius: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    bottom: 50,
+    right: 20,
+  },
+  buttonImg: {
+    width: "80%",
+    height: "80%",
+  },
+  
 });

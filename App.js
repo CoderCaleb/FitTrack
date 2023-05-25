@@ -50,6 +50,10 @@ export default function App() {
     console.log(data);
     setDataTime(data)
   }
+  useEffect(()=>{
+    console.log('TYPE',data)
+  },[data])
+
  onAuthStateChanged(auth,(user)=>{
   const checkIn = user?true:false;
   setSignIn(checkIn)
@@ -61,7 +65,6 @@ export default function App() {
       <Text style={{color:'black'}}>Back</Text>
     )
   }
-  console.log('hgi',dataTime)
   return (    
     <NavigationContainer>
     <Stack.Navigator initialRouteName="SignUpScreen" screenOptions={{
@@ -75,7 +78,7 @@ export default function App() {
       {
         signedIn?
         <>
-      <Stack.Screen name="HomeScreen" component={HomeScreen} initialParams={{time,completed}}/>
+      <Stack.Screen name="HomeScreen" component={HomeScreen} initialParams={{time,completed, getData}}/>
       <Stack.Screen name="SelectScreen" component={SelectScreen} initialParams={{ getData }} />
       <Stack.Screen name="WorkoutScreen" component={Workout} initialParams={{data,getTime}}/>
       <Stack.Screen name="DoneScreen" component={DoneScreen} initialParams={{data}}/>
@@ -93,3 +96,4 @@ export default function App() {
   );
   
 }
+
