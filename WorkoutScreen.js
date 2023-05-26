@@ -19,7 +19,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import {set,ref,getDatabase,get, update} from 'firebase/database'
 import {getAuth} from 'firebase/auth'
 import CircularProgress from "react-native-circular-progress-indicator";
-
+import * as Speech from 'expo-speech'
 export default function Workout(props) {
   let timer = "02.59";
   let seconds = 20;
@@ -189,7 +189,7 @@ function SummaryScreen(props){
 }
 function ReadyScreen(props) {
   const [counter, setCounter] = useState(3);
-
+  const [firstRender,setFirstRender] = useState(true)
   useEffect(() => {
     const interval = setInterval(() => {
       setCounter((prevCounter) => {
@@ -202,11 +202,19 @@ function ReadyScreen(props) {
         }
       });
     }, 1000);
-
+    setFirstRender(false)
     return () => {
       clearInterval(interval);
     };
   }, []);
+  useEffect(()=>{
+    if(!firstRender){
+      Speech.speak('Take a rest')
+      Speech.speak(props.nextWorkout.reps+props.nextWorkout.name+'next')
+      setFirstRender(true)
+    }
+    
+  },[props.nextWorkout])
 
   return (
     <View
@@ -237,34 +245,35 @@ function ReadyScreen(props) {
 function WorkoutScreen(props) {
   const auth = getAuth()
   const userInstance = ref(getDatabase(),`/users/${auth.currentUser.uid}`)
+  useEffect(()=>{
+    Speech.speak(props.workoutInfo.reps+props.workoutInfo.name)
+  },[])
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.imgContainer}>
         <Image
-          source={require("./assets/images/push-up-pic.jpeg")}
+          source={props.workoutInfo.imageTop?props.workoutInfo.imageTop:require('./assets/images/push-up-pic.jpeg')}
           style={styles.mainImage}
         />
         <Text style={styles.encourageText}>Keep On Going!</Text>
+       
+      </View>
+      <View style={styles.infoMainContainer}>
+        
+        <View style={styles.infoContainer}>
         <Text
-          style={[
-            styles.text,
-            styles.numberText,
+          style={
             {
-              position: "absolute",
-              bottom: -50,
-              color: "#F4B324",
-              fontWeight: "700",
-              textAlign: "center",
-            },
-          ]}
+            color:'white',
+            fontSize:30,
+            fontWeight:'bold'
+            }
+          }
         >
           {props.index <= props.workout[0][props.workoutType].length
             ? `${props.workoutInfo.reps}x ${props.workoutInfo.name}`
             : "No More Workouts Left"}
         </Text>
-      </View>
-      <View style={styles.infoMainContainer}>
-        <View style={styles.infoContainer}>
           <View
             style={{
               flexDirection: "row",
@@ -272,14 +281,8 @@ function WorkoutScreen(props) {
               width: "80%",
             }}
           >
-            <Text style={styles.infoText}>{`Reps: ${
-              props.index <= props.workout[0][props.workoutType].length
-                ? props.workoutInfo.reps
-                : null
-            }`}</Text>
-            <Text style={styles.infoText}>{`Sections: ${props.index}/${
-              props.workout[0][props.workoutType].length
-            }`}</Text>
+             
+            
           </View>
 
           <View style={styles.numberPushUps}>
@@ -316,6 +319,7 @@ function WorkoutScreen(props) {
                   }
                 })
                 .catch((err)=>{console.log(err)})
+                Speech.speak('Well done')
                 props.navigation.push("DoneScreen", {
                   workouts: props.workout,
                   dataTime: Math.round(props.calculateTime()/60),
@@ -453,7 +457,7 @@ const styles = StyleSheet.create({
   },
   mainImage: {
     width: "100%",
-    height: 360,
+    height: 320,
     position: "relative",
   },
   numberText: {
@@ -484,7 +488,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: 100,
     height: 40,
-    backgroundColor: "#303030",
+    backgroundColor: "#6641ef",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 13,
@@ -504,11 +508,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   buttonText: {
-    color: "#F4B324",
+    color: 'white',
     fontSize: 15,
+    fontWeight:600
   },
   infoContainer: {
-    backgroundColor: "#F6E7D8",
     alignItems: "center",
     justifyContent: "center",
     width: "80%",

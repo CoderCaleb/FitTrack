@@ -11,11 +11,11 @@ import {
 } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import Workout from "./WorkoutScreen";
-import SelectScreen from "./SelectScreen";
 import HomeScreen from "./HomeScreen";
 import DoneScreen from "./DoneScreen";
 import LoginScreen from "./LoginScreen";
 import SignUpScreen from './SignUpScreen'
+import WelcomeScreen from "./WelcomeScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import firebase from 'firebase/compat/app'
@@ -67,7 +67,7 @@ export default function App() {
   }
   return (    
     <NavigationContainer>
-    <Stack.Navigator initialRouteName="SignUpScreen" screenOptions={{
+    <Stack.Navigator initialRouteName="WelcomeScreen" screenOptions={{
       
       headerShown:true,
       gestureEnabled:false,
@@ -79,12 +79,12 @@ export default function App() {
         signedIn?
         <>
       <Stack.Screen name="HomeScreen" component={HomeScreen} initialParams={{time,completed, getData}}/>
-      <Stack.Screen name="SelectScreen" component={SelectScreen} initialParams={{ getData }} />
       <Stack.Screen name="WorkoutScreen" component={Workout} initialParams={{data,getTime}}/>
       <Stack.Screen name="DoneScreen" component={DoneScreen} initialParams={{data}}/>
       </>
 :
 <>
+      <Stack.Screen name='WelcomeScreen' component={WelcomeScreen}></Stack.Screen>
       <Stack.Screen name="LoginScreen" component={LoginScreen}/>
       <Stack.Screen name="SignUpScreen" component={SignUpScreen}/>
       </>

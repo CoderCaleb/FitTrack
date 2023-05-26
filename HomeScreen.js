@@ -72,7 +72,7 @@ export default function HomeScreen(props) {
         <View style={styles.workoutInfoContainer}>
           <View style={styles.infoBox}>
             <Image
-              source={require("./assets/images/clockimg.png")}
+              source={require("./assets/images/clock-emoji.png")}
               style={styles.iconImg}
             />
             <Text style={styles.numberText}>{time}</Text>
@@ -86,7 +86,7 @@ export default function HomeScreen(props) {
             style={[
               styles.infoBox,
               {
-                backgroundColor: "#87CBB9",
+                backgroundColor: "#17191a",
               },
             ]}
           >
@@ -111,6 +111,7 @@ export default function HomeScreen(props) {
 <WorkoutBox
           infoType={value}
           infoTime={Math.round(calculateTime(value)/60)}
+          infoSections={workouts[0][value].length}
           bgImage={workouts[0][value][0]['bgImage']}
           setSelected={setSelected}
           isScrolling={isScrolling}
@@ -184,7 +185,10 @@ function WorkoutBox(props) {
         <ImageBackground style={styles.imgBg} source={props.bgImage} imageStyle={{borderRadius:10}}>
           <View style={{flex:1,borderRadius:10,justifyContent:'flex-end',backgroundColor: 'rgba(0,0,0,0.2)',padding:15,gap:5}}>
             <Text style={styles.infoText}>{props.infoType.charAt(0).toUpperCase()+props.infoType.slice(1)}</Text>
+            <View style={{flexDirection:'row',gap:10}}>
             <Text style={styles.textTime}>{props.infoTime+' minutes'}</Text>
+            <Text style={styles.textTime}>{props.infoSections+' sections'}</Text>
+            </View>
           </View>
         </ImageBackground>
 
@@ -216,7 +220,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     flex: 1,
-    backgroundColor: "#010f2a",
+    backgroundColor: "#0f0f0f",
   },
   userInfoContainer: {
     alignItems: "flex-start",
@@ -249,7 +253,7 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     flex: 1,
-    backgroundColor: "#D4ADFC",
+    backgroundColor: "#17191a",
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
@@ -260,7 +264,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   infoType: {
-    color: "black",
+    color: "#474a4b",
     fontSize: 13,
   },
   button: {
@@ -275,7 +279,7 @@ const styles = StyleSheet.create({
   numberText: {
     fontSize: 30,
     fontWeight: "bold",
-    color: "black",
+    color: "white",
   },
   titleText:{
     color:'#576CBC',
@@ -290,7 +294,7 @@ const styles = StyleSheet.create({
     flex:1,
   },
   logOutButton:{
-    backgroundColor:'#3E54AC',
+    backgroundColor:'#52afaa',
     width:100,
     height:40,
     alignItems:'center',
