@@ -10,7 +10,8 @@ import {
 import React from "react";
 import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import CircularProgress from "react-native-circular-progress-indicator";
+import { update, ref, get, getDatabase } from "firebase/database";
+import Toast from 'react-native-toast-message'
 //import { initializeApp } from "firebase/app";
 
 export default function LoginScreen(props) {
@@ -18,6 +19,7 @@ export default function LoginScreen(props) {
   const [email, setEmail] = useState(null);
   const [isFocused, setIsFocused] = useState("");
   const [wrong, setWrong] = useState(false);
+  const [timePassed, setTimePassed] = useState(false);
   const userInfo = {
     password: "123",
     username: "Drippydino",
@@ -32,17 +34,75 @@ export default function LoginScreen(props) {
   function handleLogin() {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
+      .then((userCreds) => {
         console.log("User logged in!");
-        props.navigation.navigate("HomeScreen");
+        const user = userCreds.user;
         setWrong(false);
+        Toast.show({
+          type:'success',
+          text1:'Successfully logged in!',
+          text2:'Welcome back'
+        })
+        get(ref(getDatabase(), `/users/${user.uid}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            if (streakBroken(Date.now(), parseInt(snapshot.val().lastLogin))) {
+              props.navigation.navigate("StreakScreen",{streakStatus:'broken'});
+              update(ref(getDatabase(), `/users/${user.uid}`), {
+                dailyStreak: 0,
+              })
+                .catch((err) => console.log(err));
+              console.log("Streak is broken");
+            } else if (true) {
+              checkCooldown(user).then(value=>{
+                if(value){
+                  update(ref(getDatabase(), `/users/${user.uid}`), {
+                    dailyStreak: snapshot.val().dailyStreak + 1,
+                    lastDaily: Date.now(),
+                  })
+                  .catch(err=>console.log(err))
+                  props.navigation.navigate("StreakScreen",{streakStatus:'active'});
+                  console.log("Streak is active");
+                }
+                else{
+                  console.log('Not active')
+                  props.navigation.navigate("HomeScreen");
+
+                }
+                
+              })
+             
+            }
+            update(ref(getDatabase(), `/users/${user.uid}`), {
+              lastLogin: Date.now(),
+            })
+           .catch(err=>console.log(err))
+          }
+        });
       })
       .catch((err) => {
         console.log(err.message);
+          Toast.show({
+            type:'error',
+            text1:'Login failed',
+            text2:'Please check your password and username'
+          })
         setWrong(true);
       });
   }
+  function streakBroken(timeStamp1, timeStamp2) {
+    //const dayInMillis = 24 * 60 * 60 * 1000;
+    const dayInMillis = 86400000;
+    return timeStamp1 - timeStamp2 >= dayInMillis ? true : false;
+  }
+  async function checkCooldown(user) {
+    const cooldown = 86400000;
+    const snapshot = await get(ref(getDatabase(), `/users/${user.uid}/lastDaily`))
 
+      if (snapshot.exists()) {
+        return Date.now() - snapshot.val() >= cooldown;
+      }
+    ;
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.marginContainer}>
@@ -89,7 +149,7 @@ export default function LoginScreen(props) {
         <View
           style={
             wrong
-              ? [styles.wrongPasswordContainer, { display:'flex'}]
+              ? [styles.wrongPasswordContainer, { display: "flex" }]
               : styles.wrongPasswordContainer
           }
         >
@@ -115,6 +175,7 @@ export default function LoginScreen(props) {
           </Text>
         </Text>
       </View>
+      <Toast/>
     </SafeAreaView>
   );
 }

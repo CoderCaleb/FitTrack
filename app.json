@@ -1,10 +1,11 @@
 {
   "expo": {
-    "name": "FitTrack-App",
-    "slug": "FitTrack-App",
+    "name": "FitTrack App",
+    "slug": "fittrack-app",
+    "description": "Track your fitness progress and stay motivated with FitTrack App. Log your workouts, monitor your daily activity, and see your progress over time to reach new milestones",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/fittrack-logo.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/images/fittrack-logo.png",
@@ -21,10 +22,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.codercaleb.fittrackapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "734f1df9-f162-40f4-a394-5fc296dc620b"
+      }
     }
   }
 }

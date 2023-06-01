@@ -10,7 +10,7 @@ import {
     TouchableOpacity,
   } from "react-native";
   import { useState, useEffect, useRef } from "react";
-import { set } from "firebase/database";
+  import ConfettiCannon from 'react-native-confetti-cannon'
 export default function DoneScreen(props) {
   const [dataTime,setDataTime] = useState(443)
   useEffect(()=>{
@@ -20,6 +20,7 @@ export default function DoneScreen(props) {
   },[props.route.params['dataTime']])
     return (
       <SafeAreaView style={styles.container}>
+        <ConfettiCannon count={200} fadeOut={true} origin={{x: -10, y: 0}}/>
         <Image source={require('./assets/images/throphy.png')} style={styles.throphyImg}></Image>
         <Text style={styles.congratulateText}>Congratulations!</Text>
         <Text style={styles.subText}>You have completed the workout!</Text>
@@ -31,7 +32,7 @@ export default function DoneScreen(props) {
           </View>
           <View style={styles.resultContainer}>
             <Text style={styles.titleText}>{props.route.params['workouts'][0][props.route.params.data].length}</Text>
-            <Text style={styles.subText}>Sections Completed</Text>
+            <Text style={styles.subText}>Workouts Completed</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.homeButton} onPress={()=>props.navigation.push('HomeScreen')}><Text style={styles.text}>Home</Text></TouchableOpacity>

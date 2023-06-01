@@ -1,12 +1,11 @@
 import { View, Text, StyleSheet,Image,TouchableOpacity } from 'react-native'
-import { useState } from 'react'
 import React from 'react'
 
 export default function WelcomeScreen(props) {
   return (
     <View style={styles.container}>
       <Image source={require('./assets/images/carrot-workout-icon.png')} style={styles.imageIcon}></Image>
-      <Text style={styles.mainText}>Welcome to FitLife, where your fitness goals become reality</Text>
+      <Text style={styles.mainText}>Welcome to FitTrack, where your fitness goals become reality</Text>
       <Text style={styles.subText}>Get ready to challenge yourself and achieve your fitness goals with our comprehensive workout routines and progress tracking.</Text>
       <View style={{alignItems:'center',width:'100%',gap:10}}>
       <TouchableOpacity style={styles.button} onPress={()=>props.navigation.navigate('SignUpScreen')}>
@@ -18,12 +17,12 @@ export default function WelcomeScreen(props) {
   )
 }
 
-styles = StyleSheet.create({
+const styles = StyleSheet.create({
     container:{
        flex:1,
        justifyContent:'center',
        alignItems:'center',
-       backgroundColor:'#191b1e',
+       backgroundColor: "#101010",
        gap:25
     },
     imageLogo:{

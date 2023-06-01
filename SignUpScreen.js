@@ -43,6 +43,9 @@ export default function LoginScreen(props) {
                 completed: 0,
                 name: user.displayName,
                 timeSpent: 0,
+                lastLogin: Date.now(),
+                dailyStreak: 0,
+                lastDaily: Date.now()
               },
             });
           })
