@@ -43,6 +43,7 @@ export default function App() {
   const [dataTime, setDataTime] = useState(0)
   const [completed, setCompleted] = useState(0)
   const [signedIn, setSignIn] = useState(false)
+  const [login, setLogin] = useState(false)
   function getData(data) {
     setData(data)
     console.log('data: ',data)
@@ -55,10 +56,18 @@ export default function App() {
     console.log('TYPE',data)
   },[data])
 
- onAuthStateChanged(auth,(user)=>{
-  const checkIn = user?true:false;
-  setSignIn(checkIn)
- })
+  useEffect(()=>{
+    /*
+    onAuthStateChanged(auth,(user)=>{
+      if(login){
+        const checkIn = user?true:false;
+        setSignIn(checkIn)
+        setLogin(false)
+        console.log('Login:',login)
+      }
+     })
+     */
+  },[login])
   
   const Stack = createStackNavigator();
   function CustomHeader(){
@@ -77,9 +86,9 @@ export default function App() {
     }}>
 
       {
-        signedIn?
+        login?
         <>
-      <Stack.Screen name="HomeScreen" component={HomeScreen} initialParams={{time,completed}}/>
+      <Stack.Screen name="HomeScreen" component={HomeScreen} initialParams={{time,completed,setLogin}}/>
       <Stack.Screen name="WorkoutScreen" component={Workout} initialParams={{data,getTime}}/>
       <Stack.Screen name="DoneScreen" component={DoneScreen} initialParams={{data}}/>
       <Stack.Screen name="StreakScreen" component={StreakScreen}/>
@@ -87,8 +96,8 @@ export default function App() {
 :
 <>
       <Stack.Screen name='WelcomeScreen' component={WelcomeScreen}></Stack.Screen>
-      <Stack.Screen name="LoginScreen" component={LoginScreen}/>
-      <Stack.Screen name="SignUpScreen" component={SignUpScreen}/>
+      <Stack.Screen name="LoginScreen" component={LoginScreen} initialParams={{setLogin}}/>
+      <Stack.Screen name="SignUpScreen" component={SignUpScreen} initialParams={{setLogin}}/>
       </>
       }
 

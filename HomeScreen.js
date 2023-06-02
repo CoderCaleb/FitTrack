@@ -24,7 +24,7 @@ import { workouts } from "./WorkoutData";
 const ButtonContext = React.createContext();
 
 export default function HomeScreen(props) {
-  const auth = getAuth();
+  let auth = getAuth();
   const userInstance = ref(getDatabase(), `/users/${auth.currentUser.uid}`);
   const [completed, setCompleted] = useState(0);
   const [time, setTime] = useState(0);
@@ -36,17 +36,27 @@ export default function HomeScreen(props) {
   const [modalVisable, setModalVisable] = useState(false);
   const [fetchedPfp, setFetchedPfp] = useState("");
   const keys = Object.keys(workouts[0]);
-  let data = {};
 
   useEffect(() => {
     console.log(auth);
 
     onValue(userInstance, (snapshot) => {
-      data = snapshot.val();
+      const data = snapshot.val();
       setCompleted(data.completed);
       setTime(data.timeSpent);
     });
+    
   }, []);
+  useEffect(()=>{
+    if(props.route.params.showToast){
+      Toast.show({
+        type:'success',
+        text1:'Login successful!',
+        text2:'Welcome back'
+      })
+    }
+   
+  },[props.route.params.showToast])
   function handleSignOut() {
     signOut(auth)
       .then((result) => {
@@ -55,6 +65,7 @@ export default function HomeScreen(props) {
       .catch((err) => {
         console.log(err);
       });
+    props.route.params.setLogin(false)
     props.navigation.navigate("LoginScreen");
   }
   function calculateTime(data) {
@@ -71,7 +82,9 @@ export default function HomeScreen(props) {
     return finalResult;
   }
   onAuthStateChanged(auth, (user) => {
-    setFetchedPfp(user.photoURL);
+    if(user){
+      setFetchedPfp(user.photoURL);
+    }
   });
   return (
     <ScrollView

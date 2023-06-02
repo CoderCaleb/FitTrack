@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { update, ref, get, getDatabase } from "firebase/database";
@@ -20,29 +20,26 @@ export default function LoginScreen(props) {
   const [isFocused, setIsFocused] = useState("");
   const [wrong, setWrong] = useState(false);
   const [timePassed, setTimePassed] = useState(false);
+  const [showToast, setShowToast] = useState(false)
   const userInfo = {
     password: "123",
     username: "Drippydino",
   };
-  function checkInfo(password, username) {
-    if (userInfo.password == password && userInfo.username == username) {
-      return true;
-    } else {
-      return false;
+  useEffect(()=>{
+    if(getAuth().currentUser){
+      props.navigation.navigate("HomeScreen",{showToast:showToast});
     }
-  }
+  },[showToast])
+  
   function handleLogin() {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCreds) => {
         console.log("User logged in!");
         const user = userCreds.user;
+        props.route.params.setLogin(true)
         setWrong(false);
-        Toast.show({
-          type:'success',
-          text1:'Successfully logged in!',
-          text2:'Welcome back'
-        })
+        setShowToast(true)
         get(ref(getDatabase(), `/users/${user.uid}`)).then((snapshot) => {
           if (snapshot.exists()) {
             if (streakBroken(Date.now(), parseInt(snapshot.val().lastLogin))) {
@@ -65,8 +62,6 @@ export default function LoginScreen(props) {
                 }
                 else{
                   console.log('Not active')
-                  props.navigation.navigate("HomeScreen");
-
                 }
                 
               })

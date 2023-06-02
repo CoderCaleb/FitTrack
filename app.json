@@ -5,7 +5,7 @@
     "description": "Track your fitness progress and stay motivated with FitTrack App. Log your workouts, monitor your daily activity, and see your progress over time to reach new milestones",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/fittrack-logo.png",
+    "icon": "./assets/images/fittrack-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/images/fittrack-logo.png",

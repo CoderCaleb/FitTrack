@@ -9,9 +9,10 @@ import {
 } from "react-native";
 import React from "react";
 import { useState, useEffect } from "react";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
 import { getAuth } from "firebase/auth";
 import { ref, push, getDatabase, set, update } from "firebase/database";
+import Toast from 'react-native-toast-message'
 export default function LoginScreen(props) {
   const [isFocused, setIsFocused] = useState("");
   const [password, setPassword] = useState("");
@@ -33,8 +34,15 @@ export default function LoginScreen(props) {
     createUserWithEmailAndPassword(auth, email, password)
       .then((creds) => {
         const user = creds.user;
+        props.route.params.setLogin(false)
+        Toast.show({
+          type:'success',
+          text1:'Sign up successful',
+          text2:'Try logging in 👍'
+        })
         updateProfile(user, {
           displayName: username,
+          photoURL: 'https://static.vecteezy.com/system/resources/thumbnails/002/534/006/small/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg'
         })
           .then((result) => {
             console.log("Profile updated successfully");
@@ -53,7 +61,22 @@ export default function LoginScreen(props) {
 
         console.log("Login successful", user.displayName);
       })
-      .catch((err) => console.log(err.message));
+      .catch((err) => {console.log(err.message) 
+      if(err.message=='Firebase: Error (auth/email-already-in-use).'){
+        Toast.show({
+          type:'error',
+          text1:'Email in use',
+          text2:'Try another email'
+        })
+      }
+      else{
+        Toast.show({
+          type:'error',
+          text1:'A problem was encountered',
+          text2:'Try signing up again'
+        })
+      }
+    });
   }
   function filterPassword() {
     const hasNumber = /\d/;
@@ -180,16 +203,17 @@ export default function LoginScreen(props) {
               color: "#b74a58",
             },
           ]}
-        >
+        > 
           {error}
         </Text>
 
         <TouchableOpacity
           style={styles.logInButton}
           onPress={() => {
-            filterPassword() && filterEmail()
-              ? handleSignup()
-              : console.log(error);
+            if(filterPassword() && filterEmail()){
+              handleSignup()
+            }
+            
             setIsClicked(true);
           }}
         >
@@ -205,6 +229,7 @@ export default function LoginScreen(props) {
           </Text>
         </Text>
       </View>
+      <Toast/>
     </SafeAreaView>
   );
 }
