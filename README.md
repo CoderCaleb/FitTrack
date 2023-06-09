@@ -4,6 +4,8 @@ My Fitness App is a mobile application designed to help users track their workou
 
 ## Features
 
-- **Exercise Tracking:** Log your workouts and keep track of exercises performed, sets and reps.
+- **Exercise Tracking:** Log your workouts and keep track of exercises performed, sets, and reps.
 - **Workout Plans:** Access pre-designed workout plans.
-- **Progress Monitoring:** Track your progress over time with your info stored
+- **Progress Monitoring:** Track your progress over time with your information stored.
+
+**[Install on Expo Go](https://expo.dev/@codercaleb/fittrack-app?serviceType=classic&distribution=expo-go)**
