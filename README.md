@@ -9,3 +9,5 @@ My Fitness App is a mobile application designed to help users track their workou
 - **Progress Monitoring:** Track your progress over time with your information stored.
 
 **[Install on Expo Go](https://expo.dev/@codercaleb/fittrack-app?serviceType=classic&distribution=expo-go)**
+
+<img src="https://i.ibb.co/Nmt9cgq/mobile-img.png" alt="App Screenshot" width="600">
